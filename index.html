@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Azure War Room V2</title>
+    <title>Azure War Room: FINAL</title>
     <style>
         /* Dark Mode "Hacker" Theme */
         :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #238636; --highlight: #1f6feb; --danger: #da3633; }
@@ -39,6 +39,7 @@
         .day-card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .day-card.done { border-color: var(--accent); opacity: 0.5; }
         .day-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; color: #f0f6fc; }
+        .phase-label { font-size: 0.75rem; text-transform: uppercase; color: #8b949e; margin-bottom: 5px; letter-spacing: 1px; }
         .task-row { display: flex; align-items: start; margin-bottom: 8px; font-size: 0.9rem; line-height: 1.4; }
         input[type="checkbox"] { transform: scale(1.3); margin-right: 12px; margin-top: 3px; accent-color: var(--accent); }
 
@@ -80,7 +81,8 @@
 
 <script>
     // --- CONFIGURATION ---
-    // The "Daily Routine" Data
+    
+    // 1. DAILY ROUTINE DATA
     const routineData = [
         { start: "05:00", end: "05:30", icon: "☕", title: "Wake Up & Caffeine", desc: "No Phone. Splash water." },
         { start: "05:30", end: "07:30", icon: "🧠", title: "DEEP STUDY", desc: "Watch Videos. No Coding yet." },
@@ -92,18 +94,47 @@
         { start: "23:00", end: "05:00", icon: "😴", title: "SLEEP", desc: "Recovery mode." }
     ];
 
-    // The "30-Day Plan" Data (First 10 days sample - Add more as needed)
+    // 2. FULL 30-DAY PLAN DATA
     const planData = [
-        { day: 1, title: "Compute Launch", tasks: ["Watch: App Service Plans", "Lab: Deploy .NET API (Free Tier)"] },
-        { day: 2, title: "Scaling Rules", tasks: ["Watch: Manual vs Auto Scale", "Lab: Config Auto-scale Rule"] },
-        { day: 3, title: "Azure Functions", tasks: ["Watch: Triggers & Bindings", "Lab: Create HTTP Trigger"] },
-        { day: 4, title: "Timer Triggers", tasks: ["Watch: Durable Functions", "Lab: Create 5-min Timer"] },
-        { day: 5, title: "Containers", tasks: ["Watch: Docker Basics", "Lab: Deploy to ACI"] },
-        { day: 6, title: "Review & Quiz", tasks: ["Take 20-Q Quiz", "Review Weak Spots"] },
-        { day: 7, title: "Mini Project", tasks: ["Build Serverless Calculator", "Deploy to Azure"] },
-        { day: 8, title: "Cosmos DB", tasks: ["Watch: Partition Keys", "Lab: Create Cosmos Account"] },
-        { day: 9, title: "Data Insert", tasks: ["Watch: RUs/sec", "Lab: Insert Data via C# SDK"] },
-        { day: 10, title: "Blob Storage", tasks: ["Watch: Access Tiers", "Lab: Upload File via Code"] }
+        // WEEK 1: COMPUTE
+        { day: 1, phase: "COMPUTE", title: "App Service Launch", tasks: ["Watch: App Service Plans", "Lab: Deploy .NET API (Free Tier)"] },
+        { day: 2, phase: "COMPUTE", title: "Scaling Rules", tasks: ["Watch: Manual vs Auto Scale", "Lab: Config Auto-scale Rule"] },
+        { day: 3, phase: "COMPUTE", title: "Azure Functions", tasks: ["Watch: Triggers & Bindings", "Lab: Create HTTP Trigger"] },
+        { day: 4, phase: "COMPUTE", title: "Timer Triggers", tasks: ["Watch: Durable Functions", "Lab: Create 5-min Timer"] },
+        { day: 5, phase: "COMPUTE", title: "Containers", tasks: ["Watch: Docker Basics", "Lab: Deploy to ACI"] },
+        { day: 6, phase: "COMPUTE", title: "Review & Quiz", tasks: ["Take 20-Q Quiz (Whizlabs)", "Review Weak Spots"] },
+        { day: 7, phase: "COMPUTE", title: "Mini Project", tasks: ["Build Serverless Calculator", "Deploy to Azure"] },
+
+        // WEEK 2: DATA & STORAGE
+        { day: 8, phase: "DATA", title: "Cosmos DB Intro", tasks: ["Watch: Partition Keys", "Lab: Create Cosmos Account"] },
+        { day: 9, phase: "DATA", title: "Data Interaction", tasks: ["Watch: RUs/sec", "Lab: Insert Data via C# SDK"] },
+        { day: 10, phase: "DATA", title: "Blob Storage", tasks: ["Watch: Access Tiers", "Lab: Upload File via Code"] },
+        { day: 11, phase: "DATA", title: "Lifecycle Mgmt", tasks: ["Watch: Auto-delete Rules", "Lab: Set Lifecycle Policy"] },
+        { day: 12, phase: "DATA", title: "Storage Security", tasks: ["Watch: SAS Tokens", "Lab: Generate SAS & Access"] },
+        { day: 13, phase: "DATA", title: "Consistency", tasks: ["Watch: Consistency Levels", "Lab: Test Latency"] },
+        { day: 14, phase: "DATA", title: "Weekly Project", tasks: ["Update Calculator with DB", "Deploy Updates"] },
+
+        // WEEK 3: SECURITY & MESSAGING
+        { day: 15, phase: "SECURITY", title: "Entra ID (Azure AD)", tasks: ["Watch: App Registrations", "Lab: Register App in Portal"] },
+        { day: 16, phase: "SECURITY", title: "Managed Identity", tasks: ["Watch: System vs User Identity", "Lab: Access Key Vault w/o PW"] },
+        { day: 17, phase: "SECURITY", title: "Key Vault", tasks: ["Watch: Secrets vs Keys", "Lab: Fetch Secret from Code"] },
+        { day: 18, phase: "SECURITY", title: "Event Grid", tasks: ["Watch: Event Grid vs Hub", "Lab: Trigger on Blob Upload"] },
+        { day: 19, phase: "SECURITY", title: "Service Bus", tasks: ["Watch: Queues vs Topics", "Lab: Send/Receive Msg C#"] },
+        { day: 20, phase: "SECURITY", title: "AuthN/AuthZ", tasks: ["Watch: Easy Auth", "Lab: Add Google Login"] },
+        { day: 21, phase: "SECURITY", title: "Weekly Project", tasks: ["Secure App with KeyVault", "Deploy Updates"] },
+
+        // WEEK 4: MONITORING & OPTIMIZATION
+        { day: 22, phase: "MONITOR", title: "Redis Cache", tasks: ["Watch: Cache-Aside Pattern", "Lab: Create Redis Instance"] },
+        { day: 23, phase: "MONITOR", title: "Caching Code", tasks: ["Lab: Implement Cache in C#", "Verify Speed"] },
+        { day: 24, phase: "MONITOR", title: "App Insights", tasks: ["Watch: Metrics & Logs", "Lab: Add ILogger to Func"] },
+        { day: 25, phase: "MONITOR", title: "CDN", tasks: ["Watch: CDN Profiles", "Lab: Serve Static Assets"] },
+        { day: 26, phase: "MONITOR", title: "Troubleshooting", tasks: ["Review: 403/500 Errors", "Practice Exam 1 (Open Book)"] },
+        { day: 27, phase: "MONITOR", title: "Exam Prep", tasks: ["Review: CLI Commands", "Practice Exam 2 (Timed)"] },
+        { day: 28, phase: "MONITOR", title: "Final Review", tasks: ["Memorize SKU Limits", "Rest Brain"] },
+
+        // FINAL PUSH
+        { day: 29, phase: "FINAL", title: "Mock Exam", tasks: ["Score > 85% MeasureUp", "Book Exam Slot"] },
+        { day: 30, phase: "FINAL", title: "EXAM DAY", tasks: ["PASS AZ-204", "Update LinkedIn"] }
     ];
 
     // --- LOGIC ---
@@ -114,19 +145,16 @@
         const timeString = now.toLocaleTimeString('en-US', { hour12: false });
         document.getElementById('live-clock').innerText = timeString;
         
-        // Highlight current routine block
         const currentHour = now.getHours() + (now.getMinutes()/60);
         
-        routineData.forEach((slot, index) => {
+        document.querySelectorAll('.routine-card').forEach((el, index) => {
+            const slot = routineData[index];
             const startH = parseFloat(slot.start.split(':')[0]) + parseFloat(slot.start.split(':')[1])/60;
             let endH = parseFloat(slot.end.split(':')[0]) + parseFloat(slot.end.split(':')[1])/60;
-            if(endH < startH) endH += 24; // Handle overnight (23:00 to 05:00)
+            if(endH < startH) endH += 24; 
 
-            const el = document.getElementById(`routine-${index}`);
-            // Check if current time is within slot
-            // (Adjusting for 24h wrap around for sleep)
             let isCurrent = false;
-            if (startH > endH) { // Spans midnight
+            if (startH > endH) { 
                  isCurrent = (currentHour >= startH) || (currentHour < endH);
             } else {
                  isCurrent = (currentHour >= startH && currentHour < endH);
@@ -134,8 +162,7 @@
 
             if (isCurrent) {
                 el.classList.add('current');
-                document.getElementById('current-status').innerText = "CURRENT: " + slot.title;
-                document.getElementById('current-status').classList.add('live');
+                document.getElementById('current-status').innerText = "NOW: " + slot.title;
             } else {
                 el.classList.remove('current');
             }
@@ -181,15 +208,14 @@
 
             container.innerHTML += `
                 <div class="day-card ${done === total ? 'done' : ''}">
+                    <div class="phase-label">Day ${day.day} • ${day.phase}</div>
                     <div class="day-header">
-                        <span>Day ${day.day}</span>
                         <span style="color:#58a6ff">${day.title}</span>
                     </div>
                     ${tasksHtml}
                 </div>`;
         });
 
-        // Update Progress
         const percent = Math.round((done / total) * 100);
         document.getElementById('progress-fill').style.width = percent + '%';
         document.getElementById('percent-text').innerText = percent + '%';
