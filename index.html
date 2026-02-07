@@ -2,166 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure War Room</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Azure War Room: FINAL</title>
     <style>
-        /* Mobile-First Dark Mode Design */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 15px; padding-bottom: 50px; }
-        h1 { text-align: center; color: #58a6ff; margin-bottom: 5px; font-size: 1.8em; }
-        .subtitle { text-align: center; color: #8b949e; font-size: 0.9em; margin-bottom: 20px; }
+        /* Dark Mode "Hacker" Theme */
+        :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #238636; --highlight: #1f6feb; --danger: #da3633; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 80px; }
         
-        /* Progress Bar */
-        .sticky-header { position: sticky; top: 0; background: #0d1117; padding-bottom: 10px; z-index: 100; border-bottom: 1px solid #30363d; margin-bottom: 15px; }
-        .progress-container { background: #21262d; border-radius: 6px; height: 20px; width: 100%; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #238636, #2ea043); width: 0%; transition: width 0.5s ease; }
-        .status-text { text-align: center; font-weight: bold; margin-top: 5px; color: #58a6ff; font-size: 1.1em; }
+        /* Sticky Navigation Tabs */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 15px 0; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
+        .nav-item { color: #8b949e; text-decoration: none; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active { color: var(--highlight); }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 5px; }
 
-        /* Day Cards */
-        .phase-title { color: #f0f6fc; margin-top: 30px; border-bottom: 1px solid #30363d; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9em; }
-        .day-card { background: #161b22; margin-bottom: 15px; padding: 15px; border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
-        .day-card.completed { border-left: 5px solid #238636; opacity: 0.7; }
-        .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .day-num { background: #30363d; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
-        .day-title { font-weight: 600; color: #f0f6fc; font-size: 1.1em; }
-        
-        /* Tasks */
-        .task-item { display: flex; align-items: flex-start; margin-bottom: 12px; font-size: 0.95em; line-height: 1.4; }
-        input[type="checkbox"] { transform: scale(1.4); margin-right: 12px; margin-top: 3px; accent-color: #238636; cursor: pointer; }
-        label { cursor: pointer; }
-        .reset-btn { width: 100%; padding: 15px; background: #21262d; color: #8b949e; border: 1px solid #30363d; border-radius: 8px; margin-top: 40px; }
+        /* Header */
+        .header { background: var(--card); padding: 20px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .header h1 { margin: 0; color: #58a6ff; font-size: 1.5rem; }
+        .clock { font-size: 2.5rem; font-weight: bold; margin: 10px 0; font-family: monospace; color: var(--text); }
+        .status-badge { background: var(--border); padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; color: #8b949e; display: inline-block; }
+        .status-badge.live { background: var(--accent); color: white; animation: pulse 2s infinite; }
+
+        /* Content Pages */
+        .page { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+
+        /* DAILY ROUTINE STYLES */
+        .routine-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; opacity: 0.6; transition: all 0.3s; }
+        .routine-card.current { border-left: 5px solid var(--highlight); opacity: 1; transform: scale(1.02); box-shadow: 0 0 15px rgba(31, 111, 235, 0.2); background: #1c2128; }
+        .time-slot { font-weight: bold; color: var(--highlight); min-width: 85px; font-size: 0.9rem; }
+        .activity { flex-grow: 1; font-size: 0.95rem; }
+        .icon { margin-right: 10px; font-size: 1.2rem; }
+
+        /* 30-DAY PLAN STYLES */
+        .progress-bar-container { background: #21262d; height: 10px; border-radius: 5px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s; }
+        .day-card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .day-card.done { border-color: var(--accent); opacity: 0.5; }
+        .day-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; color: #f0f6fc; }
+        .phase-label { font-size: 0.75rem; text-transform: uppercase; color: #8b949e; margin-bottom: 5px; letter-spacing: 1px; }
+        .task-row { display: flex; align-items: start; margin-bottom: 8px; font-size: 0.9rem; line-height: 1.4; }
+        input[type="checkbox"] { transform: scale(1.3); margin-right: 12px; margin-top: 3px; accent-color: var(--accent); }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="sticky-header">
-        <h1>??? Azure War Room</h1>
-        <div class="subtitle">AZ-204 Job Proof Tracker</div>
-        <div class="status-text" id="status-text">0% READY</div>
-        <div class="progress-container">
-            <div id="progress-fill" class="progress-fill"></div>
-        </div>
+    <div class="header">
+        <h1>🛡️ Azure War Room</h1>
+        <div class="clock" id="live-clock">00:00:00</div>
+        <div id="current-status" class="status-badge live">System Active</div>
     </div>
 
-    <div id="app-container"></div>
-    <button class="reset-btn" onclick="resetProgress()">?? Reset All Progress</button>
+    <div id="tab-routine" class="page active">
+        <h3 style="color: #8b949e; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 15px;">Target Schedule (Mon-Fri)</h3>
+        <div id="routine-container"></div>
+    </div>
+
+    <div id="tab-plan" class="page">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span id="percent-text" style="font-size: 2rem; font-weight: bold; color: var(--accent);">0%</span>
+            <div style="color: #8b949e; font-size: 0.9rem;">JOB PROOF STATUS</div>
+            <div class="progress-bar-container"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+        <div id="plan-container"></div>
+        <button onclick="resetData()" style="width:100%; padding:15px; background:var(--card); color:#8b949e; border:1px solid var(--border); border-radius:8px; margin-top:20px;">⚠️ Reset Progress</button>
+    </div>
+
+    <div class="nav-bar">
+        <a href="#" class="nav-item active" onclick="switchTab('routine')">
+            <span class="nav-icon">⏰</span> Daily Routine
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('plan')">
+            <span class="nav-icon">📅</span> 30-Day Plan
+        </a>
+    </div>
 
 <script>
-    // THE 30-DAY WAR ROOM PLAN
-    const plan = [
-        // WEEK 1: COMPUTE
-        { phase: "Week 1: Compute Engine", day: 1, title: "App Service Launch", tasks: ["Watch: App Service Plans (Std vs Prem)", "Lab: Deploy .NET API to App Service Free"] },
-        { phase: "Week 1: Compute Engine", day: 2, title: "Auto-Scaling", tasks: ["Watch: Scale Up vs Scale Out", "Lab: Config Auto-scale rule in Portal"] },
-        { phase: "Week 1: Compute Engine", day: 3, title: "Azure Functions", tasks: ["Watch: Triggers & Bindings", "Lab: Create HTTP Trigger Function"] },
-        { phase: "Week 1: Compute Engine", day: 4, title: "Durable Functions", tasks: ["Watch: Chaining Pattern", "Lab: Create Timer Trigger (5 mins)"] },
-        { phase: "Week 1: Compute Engine", day: 5, title: "Containers", tasks: ["Watch: Docker & ACI Basics", "Lab: Deploy Docker Image to ACI"] },
-        { phase: "Week 1: Compute Engine", day: 6, title: "Review & Quiz", tasks: ["Take 20-Question Quiz (Whizlabs/MeasureUp)", "Review weak spots"] },
-        { phase: "Week 1: Compute Engine", day: 7, title: "Weekly Project", tasks: ["Build 'Serverless Calculator' API", "Deploy to Azure"] },
-
-        // WEEK 2: DATA
-        { phase: "Week 2: Data & Storage", day: 8, title: "Cosmos DB Intro", tasks: ["Watch: NoSQL vs SQL", "Lab: Create Cosmos DB Account"] },
-        { phase: "Week 2: Data & Storage", day: 9, title: "Partition Keys", tasks: ["CRITICAL: Study Partition Keys", "Lab: Insert Item via C# SDK"] },
-        { phase: "Week 2: Data & Storage", day: 10, title: "Blob Storage", tasks: ["Watch: Hot/Cool/Archive Tiers", "Lab: Upload file via .NET SDK"] },
-        { phase: "Week 2: Data & Storage", day: 11, title: "Lifecycle Mgmt", tasks: ["Watch: Auto-delete rules", "Lab: Set Lifecycle Policy"] },
-        { phase: "Week 2: Data & Storage", day: 12, title: "Storage Security", tasks: ["Watch: SAS Tokens", "Lab: Generate SAS & Access File"] },
-        { phase: "Week 2: Data & Storage", day: 13, title: "Consistency", tasks: ["Watch: Strong vs Eventual Consistency", "Lab: Change Consistency Level"] },
-        { phase: "Week 2: Data & Storage", day: 14, title: "Weekly Project", tasks: ["Update Calculator to save history to Cosmos", "Test it live"] },
-
-        // WEEK 3: SECURITY
-        { phase: "Week 3: Security & Events", day: 15, title: "Entra ID (Azure AD)", tasks: ["Watch: App Registration", "Lab: Register App in Portal"] },
-        { phase: "Week 3: Security & Events", day: 16, title: "Managed Identity", tasks: ["Watch: System vs User Assigned", "Lab: Grant Function access to Key Vault"] },
-        { phase: "Week 3: Security & Events", day: 17, title: "Key Vault", tasks: ["Watch: Secrets vs Keys", "Lab: Fetch Secret from Code"] },
-        { phase: "Week 3: Security & Events", day: 18, title: "Event Grid", tasks: ["Watch: Event Grid vs Service Bus", "Lab: Blob Upload Trigger"] },
-        { phase: "Week 3: Security & Events", day: 19, title: "Service Bus", tasks: ["Watch: Queues vs Topics", "Lab: Send/Receive Message C#"] },
-        { phase: "Week 3: Security & Events", day: 20, title: "AuthN vs AuthZ", tasks: ["Watch: Easy Auth", "Lab: Enable Twitter/Google Login"] },
-        { phase: "Week 3: Security & Events", day: 21, title: "Weekly Project", tasks: ["Secure Cosmos connection with Key Vault", "Deploy updates"] },
-
-        // WEEK 4: MONITORING
-        { phase: "Week 4: Monitor & Cache", day: 22, title: "Redis Cache", tasks: ["Watch: Cache-Aside Pattern", "Lab: Create Redis Instance"] },
-        { phase: "Week 4: Monitor & Cache", day: 23, title: "Caching Code", tasks: ["Lab: Implement Cache-Aside in C#", "Verify Performance"] },
-        { phase: "Week 4: Monitor & Cache", day: 24, title: "App Insights", tasks: ["Watch: Metrics & Logs", "Lab: Add ILogger to Function"] },
-        { phase: "Week 4: Monitor & Cache", day: 25, title: "CDN", tasks: ["Watch: CDN Profiles", "Lab: Serve Static Assets via CDN"] },
-        { phase: "Week 4: Monitor & Cache", day: 26, title: "Troubleshooting", tasks: ["Review: Common Errors (500/403)", "Practice Exam 1 (Open Book)"] },
-        { phase: "Week 4: Monitor & Cache", day: 27, title: "Exam Prep", tasks: ["Review: CLI Commands", "Practice Exam 2 (Timed)"] },
-        { phase: "Week 4: Monitor & Cache", day: 28, title: "Final Review", tasks: ["Memorize SKU Limits", "Rest & Confidence"] },
-        
-        // FINAL DAYS
-        { phase: "Final Push", day: 29, title: "Mock Exam", tasks: ["Score > 85% on MeasureUp", "Book Exam Slot"] },
-        { phase: "Final Push", day: 30, title: "EXAM DAY", tasks: ["Pass AZ-204", "Update LinkedIn Profile"] }
+    // --- CONFIGURATION ---
+    
+    // 1. DAILY ROUTINE DATA
+    const routineData = [
+        { start: "05:00", end: "05:30", icon: "☕", title: "Wake Up & Caffeine", desc: "No Phone. Splash water." },
+        { start: "05:30", end: "07:30", icon: "🧠", title: "DEEP STUDY", desc: "Watch Videos. No Coding yet." },
+        { start: "07:30", end: "08:30", icon: "💻", title: "HANDS-ON CODE", desc: "Write C#. Fix bugs." },
+        { start: "08:30", end: "10:00", icon: "🚿", title: "Commute & Podcast", desc: "Listen to Azure Friday." },
+        { start: "10:00", end: "20:00", icon: "🏢", title: "OFFICE (Survival)", desc: "Do minimum. Save energy." },
+        { start: "20:00", end: "21:30", icon: "🏠", title: "Family & Dinner", desc: "No screens. Reset brain." },
+        { start: "21:30", end: "23:00", icon: "🧟", title: "LABS (Zombie Mode)", desc: "Microsoft Learn Sandbox." },
+        { start: "23:00", end: "05:00", icon: "😴", title: "SLEEP", desc: "Recovery mode." }
     ];
 
-    function render() {
-        const container = document.getElementById('app-container');
-        container.innerHTML = '';
-        let currentPhase = '';
-        let totalTasks = 0;
-        let completedTasks = 0;
+    // 2. FULL 30-DAY PLAN DATA
+    const planData = [
+        // WEEK 1: COMPUTE
+        { day: 1, phase: "COMPUTE", title: "App Service Launch", tasks: ["Watch: App Service Plans", "Lab: Deploy .NET API (Free Tier)"] },
+        { day: 2, phase: "COMPUTE", title: "Scaling Rules", tasks: ["Watch: Manual vs Auto Scale", "Lab: Config Auto-scale Rule"] },
+        { day: 3, phase: "COMPUTE", title: "Azure Functions", tasks: ["Watch: Triggers & Bindings", "Lab: Create HTTP Trigger"] },
+        { day: 4, phase: "COMPUTE", title: "Timer Triggers", tasks: ["Watch: Durable Functions", "Lab: Create 5-min Timer"] },
+        { day: 5, phase: "COMPUTE", title: "Containers", tasks: ["Watch: Docker Basics", "Lab: Deploy to ACI"] },
+        { day: 6, phase: "COMPUTE", title: "Review & Quiz", tasks: ["Take 20-Q Quiz (Whizlabs)", "Review Weak Spots"] },
+        { day: 7, phase: "COMPUTE", title: "Mini Project", tasks: ["Build Serverless Calculator", "Deploy to Azure"] },
 
-        plan.forEach((day, dIndex) => {
-            // Render Phase Header if changed
-            if (day.phase !== currentPhase) {
-                const phaseHeader = document.createElement('div');
-                phaseHeader.className = 'phase-title';
-                phaseHeader.innerText = day.phase;
-                container.appendChild(phaseHeader);
-                currentPhase = day.phase;
-            }
+        // WEEK 2: DATA & STORAGE
+        { day: 8, phase: "DATA", title: "Cosmos DB Intro", tasks: ["Watch: Partition Keys", "Lab: Create Cosmos Account"] },
+        { day: 9, phase: "DATA", title: "Data Interaction", tasks: ["Watch: RUs/sec", "Lab: Insert Data via C# SDK"] },
+        { day: 10, phase: "DATA", title: "Blob Storage", tasks: ["Watch: Access Tiers", "Lab: Upload File via Code"] },
+        { day: 11, phase: "DATA", title: "Lifecycle Mgmt", tasks: ["Watch: Auto-delete Rules", "Lab: Set Lifecycle Policy"] },
+        { day: 12, phase: "DATA", title: "Storage Security", tasks: ["Watch: SAS Tokens", "Lab: Generate SAS & Access"] },
+        { day: 13, phase: "DATA", title: "Consistency", tasks: ["Watch: Consistency Levels", "Lab: Test Latency"] },
+        { day: 14, phase: "DATA", title: "Weekly Project", tasks: ["Update Calculator with DB", "Deploy Updates"] },
 
-            const card = document.createElement('div');
-            card.className = 'day-card';
-            
-            // Check if day is fully complete to style card
-            let dayComplete = true;
+        // WEEK 3: SECURITY & MESSAGING
+        { day: 15, phase: "SECURITY", title: "Entra ID (Azure AD)", tasks: ["Watch: App Registrations", "Lab: Register App in Portal"] },
+        { day: 16, phase: "SECURITY", title: "Managed Identity", tasks: ["Watch: System vs User Identity", "Lab: Access Key Vault w/o PW"] },
+        { day: 17, phase: "SECURITY", title: "Key Vault", tasks: ["Watch: Secrets vs Keys", "Lab: Fetch Secret from Code"] },
+        { day: 18, phase: "SECURITY", title: "Event Grid", tasks: ["Watch: Event Grid vs Hub", "Lab: Trigger on Blob Upload"] },
+        { day: 19, phase: "SECURITY", title: "Service Bus", tasks: ["Watch: Queues vs Topics", "Lab: Send/Receive Msg C#"] },
+        { day: 20, phase: "SECURITY", title: "AuthN/AuthZ", tasks: ["Watch: Easy Auth", "Lab: Add Google Login"] },
+        { day: 21, phase: "SECURITY", title: "Weekly Project", tasks: ["Secure App with KeyVault", "Deploy Updates"] },
 
-            let tasksHtml = '';
-            day.tasks.forEach((task, tIndex) => {
-                const id = `d${dIndex}_t${tIndex}`;
-                const isChecked = localStorage.getItem(id) === 'true';
-                if (!isChecked) dayComplete = false;
-                if (isChecked) completedTasks++;
-                totalTasks++;
-
-                tasksHtml += `
-                    <div class="task-item">
-                        <input type="checkbox" id="${id}" onchange="toggle('${id}')" ${isChecked ? 'checked' : ''}>
-                        <label for="${id}">${task}</label>
-                    </div>
-                `;
-            });
-
-            if (dayComplete) card.classList.add('completed');
-
-            card.innerHTML = `
-                <div class="day-header">
-                    <span class="day-title">${day.title}</span>
-                    <span class="day-num">Day ${day.day}</span>
-                </div>
-                ${tasksHtml}
-            `;
-            container.appendChild(card);
-        });
-
-        // Update Progress Bar
-        const percent = Math.round((completedTasks / totalTasks) * 100);
-        document.getElementById('progress-fill').style.width = percent + '%';
-        document.getElementById('status-text').innerText = percent + '% JOB PROOF';
-    }
-
-    function toggle(id) {
-        const checkbox = document.getElementById(id);
-        localStorage.setItem(id, checkbox.checked);
-        render();
-    }
-
-    function resetProgress() {
-        if(confirm("Are you sure? This will wipe your progress.")) {
-            localStorage.clear();
-            render();
-        }
-    }
-
-    // Initial Render
-    render();
-</script>
-
-</body>
-</html>
+        // WEEK 4: MONITORING & OPTIMIZATION
+        { day: 22, phase: "MONITOR", title: "Redis Cache", tasks: ["Watch: Cache-Aside Pattern", "Lab: Create Redis Instance"] },
+        { day: 23, phase: "MONITOR", title: "Caching Code", tasks: ["Lab: Implement Cache in C#", "Verify Speed"] },
+        { day: 24, phase: "MONITOR", title: "App Insights", tasks: ["Watch: Metrics & Logs", "Lab: Add ILogger to Func"] },
+        { day: 25, phase: "MONITOR", title: "CDN", tasks: ["Watch: CDN Profiles", "Lab: Serve Static Assets"] },
+        { day:
